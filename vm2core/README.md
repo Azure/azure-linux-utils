@@ -20,11 +20,11 @@ The following steps assume Visual Studio 2017 is used for compilation...
 
 ## [Install Visual Studio and the Insider Windows SDK, minimum version 10.0.17686.0](https://www.microsoft.com/en-us/software-download/windowsinsiderpreviewSDK)
 Once installed, verify that the redistributable _vmsavedstatedumpprovider.dll_ is present.  This file will default to _C:\Program Files(x86)\Windows Kits\10\bin\10.0.17686.0\x64_.
-![winkit](/images/vmsavedstatedumpprovider_location.png)
+![winkit](/vm2core/images/vmsavedstatedumpprovider_location.png)
 
 You can also verify that the required **lib** and **h** files are present.
-![VmSavedStateDumpProviderLib](/images/vmsavedstatedumpproviderlib_location.png)
-![VmSavedStateDumpProviderHeaders](/images/vmsavedstatedumpproviderheaders_location.png)
+![VmSavedStateDumpProviderLib](/vm2core/images/vmsavedstatedumpproviderlib_location.png)
+![VmSavedStateDumpProviderHeaders](/vm2core/images/vmsavedstatedumpproviderheaders_location.png)
 
 ## Create the Visual Studio Project
 ### Get the sources from github.
