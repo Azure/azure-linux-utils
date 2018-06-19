@@ -78,9 +78,6 @@ USAGE
 =================
 1) Take a checkpoint from your VM.
 	Make sure the checkpoint is a STANDARD checkpoint vs a PRODUCTION checkpoint.
-	
-
-   
 
 2) Find the saved state files for this snapshot. The location of the saved
 state files can be found in the "Checkpoint File Location" setting in the
@@ -92,10 +89,10 @@ Browse to your checkpoint location
 		BIN and VSV files.
 
 3) Generate the "vmcore" dump with one of the following commands:
-
-	vm2core.exe <.vsv file> <.bin file> <output file>
-
-	vm2core.exe <.vmrs file> <output file>
+```bash
+vm2core.exe <vsv file> <bin file> <output file>
+vm2core.exe <vmrs file> <output file>
+````
 
 NOTE: The tool relies on VmSavedStateDumpProvider.dll which needs to be in same 
   folder as the tool in order to run.
@@ -116,18 +113,21 @@ Once you have created your core, you can load it using gdb or crash.
 Included below are details for installing kernel debug symbols and configuring crash 
 (verified that this works using 7.1.5) on Centos 7.2 and Ubuntu 16.04.03
 If you are checking our more than one kernel no worries, find is your friend.
+```bash
 find / -name System.map*
 find / -name vmlinux
+```
 CentOS 7.2 ... 
 (on centos, I performed all actions as root.)
 
 Install the kernel debuginfo​ (in my case, it was just an instance of the same vm.  
 Replace uname -r with your specific version if using a different kernel.
+```bash
 yum --enablerepo=base-debuginfo install kernel-debuginfo-$(uname -r) -y
-
+```
 
 Get Crash version 7.1.5 and build it.  Adding tools needed for ability to build before make.
-````bash
+```bash
 yum install -y wget
 wget https://github.com/crash-utility/crash/archive/7.1.5.tar.gz
 tar -xvzf 7.1.5.tar.gz
@@ -136,16 +136,17 @@ yum install ncurses-devel -y
 yum install -y zlib-devel
 cd crash-7.1.5/
 make
-````
+```
 
 Start crash and examine the core (assuming it is ../centos7.2.1511.core)
+```bash
 ./crash /usr/lib/debug/usr/lib/modules/3.10.0-327.el7.x86_64/vmlinux /boot/System.map-3.10.0-327.el7.x86_64 ../centos7.2.1511.core
-
+```
 ​
 ​​Ubuntu 16.04.03 
 (on ubuntu, i used my local user)
 First get the build tools to make crash​​​​.
-````bash
+```bash
 sudo apt-get install -y git build-essential libncurses5-dev zlib1g-dev bison make
 wget, make, and​​ install crash.
 wget https://github.com/crash-utility/crash/archive/7.1.5.tar.gz
@@ -154,7 +155,9 @@ cd crash-7.1.5/
 make
 sudo make install
 cd ..
-echo "Then get the ubuntu ​​​kernel symbols."
+```
+Now retrieve the symbols for your kernel.
+```bash
 sudo tee /etc/apt/sources.list.d/ddebs.list <<EOF
 deb http://ddebs.ubuntu.com/ $(lsb_release -c -s)          main restricted universe multiverse
 deb http://ddebs.ubuntu.com/ $(lsb_release -c -s)-updates  main restricted universe multiverse
@@ -165,9 +168,13 @@ sudo apt-key adv \
     --recv-keys 428D7C01 C8CAB6595FDFF622
 sudo apt-get update -y
 sudo apt-get install -y linux-image-$(uname -r)-dbgsym
-echo "And finally run crash... (assuming xerus.core is your core)"
+```
+
+And finally run crash... (assuming xerus.core is your core)
+
+```bash
 su​do crash /usr/lib/debug/boot/vmlinux-4.4.0-87-generic /boot/System.map-4.4.0-87-generic xerus.core
-````
+```
 
 USEFUL AUTOMATION EXAMPLES ... 
 =================
