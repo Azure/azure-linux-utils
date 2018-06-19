@@ -18,7 +18,6 @@
  *   Alex Ng 		<alexng@microsoft.com>
  *   Sean Spratt	<seansp@microsoft.com>
  */
-#include "stdafx.h"
 #include <windows.h>
 #include <winerror.h>
 #include <comdef.h>
