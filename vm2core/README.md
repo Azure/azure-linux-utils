@@ -9,55 +9,70 @@ kernel analysis tools such as "crash".
 The output format of the generated core dump is based on the same format that
 is used by the Linux kernel's /proc/vmcore component.
 
-
-### Microsoft Windows SDK Requirements ... 
-You can build **vm2core** using the public Windows SDK however the supporting DLL is not present in the release.  This omission has been corrected in the Insider's Edition of the Windows SDK.  Insider Windows SDK releases including 10.0.0.**17686**.0 contain the file **_vmsavedstatedumpprovider.dll_**
-
-## Installing the Insider Windows SDK (winkit)
-
 The following steps assume Visual Studio 2017 is used for compilation...
 
 
-## [Install Visual Studio and the Insider Windows SDK, minimum version 10.0.17686.0](https://www.microsoft.com/en-us/software-download/windowsinsiderpreviewSDK)
-Once installed, verify that the redistributable _vmsavedstatedumpprovider.dll_ is present.  This file will default to _C:\Program Files(x86)\Windows Kits\10\bin\10.0.17686.0\x64_.
+# Microsoft Windows SDK Requirements ... 
+You can build **vm2core** using the public Windows SDK however the supporting DLL is not present in the release.  This omission has been corrected in the Insider's Edition of the Windows SDK.  Insider Windows SDK releases including 10.0.0.**17686**.0 contain the file **_vmsavedstatedumpprovider.dll_**
+
+##### [Install Visual Studio and the Insider Windows SDK, minimum version 10.0.17686.0](https://www.microsoft.com/en-us/software-download/windowsinsiderpreviewSDK)
+#### Once installed, verify that the redistributable _vmsavedstatedumpprovider.dll_ is present.  This file will default to _C:\Program Files(x86)\Windows Kits\10\bin\10.0.17686.0\x64_.
 ![winkit](/vm2core/images/vmsavedstatedumpprovider_location.png)
 
-You can also verify that the required **lib** and **h** files are present.
+#### You can also verify that the required **lib** and **h** files are present.
 ![VmSavedStateDumpProviderLib](/vm2core/images/vmsavedstatedumpproviderlib_location.png)
 ![VmSavedStateDumpProviderHeaders](/vm2core/images/vmsavedstatedumpproviderheaders_location.png)
 
-## Create the Visual Studio Project
-### Get the sources from github.
+# Create the Visual Studio Project and Build ...
+#### Get the sources from github.
 ```bash
 git clone https://github.com/seansp/azure-linux-utils.git
 ```
-The sources for vm2core can be found in the vm2core folder.
+#### The sources for vm2core can be found in the src folder within vm2core.
 ```dos
 cd azure-linux-utils
 cd vm2core
 cd src
-dir
+dir  
+06/08/2018  12:00 PM             8,388 elf.h
+06/08/2018  12:00 PM             1,780 main.cpp
+06/08/2018  12:00 PM            11,242 PartitionState.cpp
+06/08/2018  12:00 PM             3,137 PartitionState.h
 ````
+#### Create your project using Visual Studio's 'Project from Existing Code' feature.
+![File->New->Project from Existing Code](/vm2core/images/vs2017_projectfromexistingcode.png)
 
-Now, include the main header file into the project to start coding! Make 
-		sure Windows.h is included before this header.
-	o	#include <vmsavedstatedump.h>
-•	To compile, for some reason Visual Studio is not smart enough to include the
-		library from the Windows SDK, and it needs to be included manually.
-	o	Go to Project->Properties->Linker->Input->Additional Dependencies and 
-		add a new entry vmsavedstatedumpprovider.lib.
-	o	Make sure the build target is x64!
+#### Navigate to where you placed the source code ...
 
-Now build and enjoy!
+![Select Project Location](/vm2core/images/vs2017_specifyprojectlocation.png)
 
-NOTE: You can share the header files and library as a redist, and add them 
-manually onto a C++ project and its build environment and it should also work. 
-This is helpful for projects that don't want to install the newest Windows SDK 
-version, but want to link against this.
-	o	Redist files:
-		•	Vmsavedstatedump.h
-		•	Vmsavedstatedumpdefs.h
-		•	Vmsavedstatedumpprovider.lib
+#### And select default windows settings.
+
+![Select Project Settings](/vm2core/images/vs2017_specifyprojectsettings.png)
+
+#### And select Finish.
+
+## Now update the project properties to use the Windows SDK properly.
+#### Open the properties on the vm2core project and select the proper Windows SDK.
+![Specify winkit](/vm2core/images/vs2017_properties_specifywinkit.png)
+#### Add the _vmsavedstatedumpprovider.lib_ file to the linker.
+![Specify winkit](/vm2core/images/vs2017_properties_linkerAdditionalDependencies.png)
+![Specify winkit](/vm2core/images/vs2017_properties_linkerAdditionalDependenciesCompleted.png)
+
+#### Verify that your build configuration is set to 64 bit. 
+##### _(you will see linker errors if this remains x86)_
+![Specify winkit](/vm2core/images/vs2017_properties_specifyamd64.png)
+
+#### Build it.
+![Build Results](/vm2core/images/vs2017_buildoutput.png)
+
+#### Get the redistributable vmsavedstatedumpprovider.dll from the winkit and place it with vm2core.exe
+```bash
+D:\src\azure-linux-utils\vm2core\x64\Debug>copy "c:\Program Files (x86)\Windows Kits\10\bin\10.0.17686.0\x64\vmsavedstatedumpprovider.dll" .
+        1 file(s) copied.
+```
+
+
 
 USAGE
 =================
