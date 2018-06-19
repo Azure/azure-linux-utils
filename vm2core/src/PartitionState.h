@@ -21,6 +21,7 @@
 #ifndef PARTITION_STATE_H
 #define PARTITION_STATE_H
 
+#include <sdkddkver.h>
 #include <windows.h>
 #include <vector>
 #include <tchar.h>
