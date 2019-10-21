@@ -77,6 +77,7 @@ public:
     HRESULT WriteDump(wchar_t *out_file);
     void FillElfNote(BYTE *buf, const char *name, void *data,
         uint32_t data_len, uint32_t type);
+    void FwriteErrCheck(const void *buffer, size_t size, size_t count, FILE *stream);
     bool WriteAllRam(FILE *filep);
     
 private:

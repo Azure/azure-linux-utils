@@ -159,6 +159,14 @@ void VmPartitionState::FillElfNote(BYTE *buf, const char *name, void *data,
 	memcpy(buf, data, note->n_descsz);
 }
 
+void VmPartitionState::FwriteErrCheck(const void *buffer, size_t size, size_t count, FILE *stream) {
+    int ret = fwrite(buffer, size, count, stream);
+    if(ret < count) {
+        wprintf(L"Failed to write to file. Likely not enough disk space.\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
 bool VmPartitionState::WriteAllRam(FILE *filep) {
     BYTE *ram_block;
     uint32_t ram_block_size = UNCOMPRESSED_BLOCK_SIZE;
@@ -176,7 +184,7 @@ bool VmPartitionState::WriteAllRam(FILE *filep) {
             ReadGuestRawSavedMemory(m_dump_handle, i, ram_block, ram_block_size, &bytesRead);
             if (bytesRead > 0) {
                 wprintf(L"Writing Memory: %I64u/%I64u MB written\r", i >> 20, m_totalramsize >> 20);
-                fwrite(ram_block, sizeof(BYTE), bytesRead, filep);
+                FwriteErrCheck(ram_block, sizeof(BYTE), bytesRead, filep);
             } else {
                 wprintf(L"No bytes could be read from dump handle.\n");
                 res = false;
@@ -288,10 +296,10 @@ HRESULT VmPartitionState::WriteDump(wchar_t *out_file) {
 #else
     FILE* filep;
     errno_t err = _wfopen_s(&filep, out_file, L"wb");
-    fwrite(&hdr, sizeof(hdr), 1, filep);
-    fwrite(phdrs, sizeof(struct elf64_phdr), hdr.e_phnum, filep);
-    fwrite(core_note_buf, sizeof(BYTE), core_note_buf_sz, filep);
-    fwrite(vmcoreinfo_buf, sizeof(BYTE), vmcoreinfo_note_sz, filep);
+    FwriteErrCheck(&hdr, sizeof(hdr), 1, filep);
+    FwriteErrCheck(phdrs, sizeof(struct elf64_phdr), hdr.e_phnum, filep);
+    FwriteErrCheck(core_note_buf, sizeof(BYTE), core_note_buf_sz, filep);
+    FwriteErrCheck(vmcoreinfo_buf, sizeof(BYTE), vmcoreinfo_note_sz, filep);
     WriteAllRam(filep);
     fclose(filep);
 #endif
