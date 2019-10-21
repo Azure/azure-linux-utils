@@ -105,12 +105,14 @@ For example, you can run this "crash" command:
 5) For guests with KASLR enabled kernels (>= RHEL 75). You need to find the
 kernel offset and phys base and supply these values to "crash" command.
 
-You may use below two commands to find the values from the generated dump file:
+You may use below two hint commands to find the values from the generated dump file:
 
 ```bash
-strings <vmcore file> | grep -v strings | grep KERNELOFFSET= | grep %lx -A 1 | grep -v %lx
+strings <vmcore file> | grep -v strings | grep KERNELOFFSET=
 strings <vmcore file> | grep -v strings | grep 'NUMBER(phys_base)='
 ````
+
+You may get several hits, choose the sane values.
 
 Then supply these values to "crash" command:
 
