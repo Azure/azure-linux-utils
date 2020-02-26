@@ -35,32 +35,31 @@ VmPartitionState::~VmPartitionState() {
 }
 
 bool VmPartitionState::ReadMemoryBlocks(VM_SAVED_STATE_DUMP_HANDLE dump_handle) {
-	MemoryBlock mem_block = { 0 };
-	
 	GetGuestRawSavedMemorySize(dump_handle, &m_totalramsize);
+	wprintf(L"Memory Dump Size: %llu MB\n", m_totalramsize >> 20);
 
-    wprintf(L"Memory Dump Size: %llu MB\n", m_totalramsize >> 20);
-
+	MemoryBlock mem_block = { 0 };
 	m_memory_blocks.clear();
 
-	if (m_totalramsize >= ((uint64_t)HV_START_GPA_GAP << (uint64_t)PAGE_SHIFT)) {
-		mem_block.gpa_start_index = 0;
-		mem_block.page_start_index = 0;
-		mem_block.page_count = HV_START_GPA_GAP;
-		m_memory_blocks.push_back(mem_block);
-
-		mem_block.gpa_start_index = HV_START_GPA_GAP + GPA_GAP_SIZE;
-		mem_block.page_start_index = HV_START_GPA_GAP;
-		mem_block.page_count = (m_totalramsize >> PAGE_SHIFT) - HV_START_GPA_GAP;
-		m_memory_blocks.push_back(mem_block);
-	} else {
-		mem_block.gpa_start_index = 0;
-		mem_block.page_start_index = 0;
-		mem_block.page_count = (m_totalramsize >> PAGE_SHIFT);
-		m_memory_blocks.push_back(mem_block);
+	std::vector<GPA_MEMORY_CHUNK> memoryChunks;
+	UINT64 pageSize = 0;
+	UINT64 memoryChunkCount = ~0;
+	if(GetGuestPhysicalMemoryChunks(m_dump_handle, &pageSize, memoryChunks.data(), &memoryChunkCount) != S_OK)
+		memoryChunks.resize(memoryChunkCount);
+        if(GetGuestPhysicalMemoryChunks(m_dump_handle, &pageSize, memoryChunks.data(), &memoryChunkCount) != S_OK) {
+                wprintf(L"GetGuestPhysicalMemoryChunks error.\n");
+		return false;
 	}
-
-	return true;
+	UINT64 i = 0;
+	for (const auto& memoryChunk : memoryChunks) {
+		mem_block.gpa_start_index = memoryChunk.GuestPhysicalStartPageIndex;
+		mem_block.page_start_index = memoryChunk.GuestPhysicalStartPageIndex;
+		mem_block.page_count = memoryChunk.PageCount;
+		m_memory_blocks.push_back(mem_block);
+		++i;
+		//wprintf(L"Memory Chunk %I64u:\nGuestPhysicalStartPageIndex: %I64u\nPageCount: %I64u\n", i, memoryChunk.GuestPhysicalStartPageIndex, memoryChunk.PageCount);
+        }
+        return true;
 }
 
 // TODO:PUBLIC Entire function Hard coded to 64.
