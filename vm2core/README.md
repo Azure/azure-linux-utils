@@ -102,17 +102,20 @@ For example, you can run this "crash" command:
 
 	crash <System Map file> <Kernel image with debug info> <vmcore file>
 
-5) For guests with KASLR enabled kernels (>= RHEL 75). You need to find the
-kernel offset and phys base and supply these values to "crash" command.
+5) For guests with KASLR enabled kernels (>= RHEL 75). You need to find the kaslr
+and phys_base and supply these values to "crash" command.
 
-You may use below two hint commands to find the values from the generated dump file:
-
+You may use the script ./find_kaslr_and_physbase.sh available in this repo to find
+the values from the generated dump file. The sample run of this command is:
 ```bash
-strings <vmcore file> | grep -v strings | grep KERNELOFFSET=
-strings <vmcore file> | grep -v strings | grep 'NUMBER(phys_base)='
-````
+santosh@u1804lts:~$ ./find_kaslr_and_physbase.sh /usr/lib/debug/boot/vmlinux-4.15.0-88-generic ubuntu-vm01.coredump
+This script takes minutes to hours depending on coredump file size ...
+kaslr = 608174080
+phys_base = 1801453568
+The complete crash command you likely need is:
+./crash/crash /usr/lib/debug/boot/vmlinux-4.15.0-88-generic ubuntu-vm01.coredump --kaslr 608174080 -m phys_base=1801453568
 
-You may get several hits, choose the sane values.
+````
 
 Then supply these values to "crash" command:
 
