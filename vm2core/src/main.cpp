@@ -33,9 +33,9 @@ void PrintHelp() {
 }
 
 int wmain(int argc, wchar_t *argv[]) {
-    wchar_t *output_file_name;
+    wchar_t *output_file_name = NULL;
 	VmPartitionState partition_state;
-	HRESULT action;
+	HRESULT action = 0;
 	
 	if (argc < 3 || argc > 4) {
 		PrintHelp();
